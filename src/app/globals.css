@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --hijau: #1D6A3A;
+  --hijau-muda: #2E8B57;
+  --hijau-terang: #4CAF77;
+  --hijau-bg: #F0FAF4;
+  --kuning: #E8B84B;
+  --kuning-bg: #FDF8EC;
+  --coklat: #5C3D1E;
+  --putih: #FAFDF8;
+  --abu: #6B7A6E;
+  --abu-muda: #E8EDE9;
+  --teks: #1A2E1F;
+  --teks-sekunder: #4A5E4F;
+  --shadow: 0 4px 24px rgba(29,106,58,0.10);
+  --radius: 14px;
+  --radius-lg: 22px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--putih);
+  color: var(--teks);
+  line-height: 1.65;
+}
+
+/* Scroll Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--abu-muda);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--hijau-terang);
+  border-radius: 4px;
+}
+
+/* Hero animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.anim-1 { animation: fadeUp 0.6s ease forwards; }
+.anim-2 { animation: fadeUp 0.7s 0.1s ease forwards; opacity: 0; }
+.anim-3 { animation: fadeUp 0.7s 0.2s ease forwards; opacity: 0; }
+.anim-4 { animation: fadeUp 0.7s 0.3s ease forwards; opacity: 0; }
+.anim-5 { animation: fadeUp 0.7s 0.4s ease forwards; opacity: 0; }

@@ -1,0 +1,454 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { BERITA, PENGUMUMAN, LAYANAN_SURAT } from '@/lib/data'
+import type { Berita, Pengumuman, LayananSurat } from '@/types'
+
+// ── Tipe tab ──────────────────────────────────────────────────
+type Tab = 'overview' | 'berita' | 'pengumuman' | 'layanan'
+
+// ── Warna & konstanta ─────────────────────────────────────────
+const H = '#1D6A3A'
+const H2 = '#2E8B57'
+const BG = '#F4F8F5'
+const CARD = '#fff'
+const BORDER = '#E2EBE5'
+const TEXT = '#1A2E1F'
+const MUTED = '#6B7A6E'
+
+// ── Komponen kecil ────────────────────────────────────────────
+function StatCard({ icon, label, value, sub }: { icon: string; label: string; value: string | number; sub?: string }) {
+  return (
+    <div style={{
+      background: CARD, borderRadius: 16, padding: '20px 24px',
+      border: `1px solid ${BORDER}`,
+      display: 'flex', gap: 16, alignItems: 'center',
+    }}>
+      <div style={{
+        width: 48, height: 48, borderRadius: 12,
+        background: '#F0FAF4', fontSize: 22,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0,
+      }}>{icon}</div>
+      <div>
+        <div style={{ fontSize: 13, color: MUTED, marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 24, fontWeight: 700, color: TEXT, fontFamily: "'Playfair Display', serif" }}>{value}</div>
+        {sub && <div style={{ fontSize: 11, color: H2, marginTop: 2 }}>{sub}</div>}
+      </div>
+    </div>
+  )
+}
+
+function Badge({ status }: { status: string }) {
+  const isActive = status === 'aktif'
+  return (
+    <span style={{
+      fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 100,
+      background: isActive ? '#E8F5E9' : '#F5F5F5',
+      color: isActive ? H : MUTED,
+    }}>{isActive ? 'Aktif' : 'Selesai'}</span>
+  )
+}
+
+// ── Main Dashboard ────────────────────────────────────────────
+export default function AdminDashboard() {
+  const router = useRouter()
+  const [tab, setTab] = useState<Tab>('overview')
+  const [beritaList, setBeritaList] = useState<Berita[]>(BERITA)
+  const [pengumumanList, setPengumumanList] = useState<Pengumuman[]>(PENGUMUMAN)
+  const [layananList] = useState<LayananSurat[]>(LAYANAN_SURAT)
+
+  // Modal state
+  const [showBeritaForm, setShowBeritaForm] = useState(false)
+  const [showPengumumanForm, setShowPengumumanForm] = useState(false)
+  const [editBerita, setEditBerita] = useState<Berita | null>(null)
+  const [editPengumuman, setEditPengumuman] = useState<Pengumuman | null>(null)
+
+  // Form state berita
+const [bForm, setBForm] = useState<{
+  judul: string
+  ringkasan: string
+  kategori: Berita['kategori']
+  emoji: string
+  bgColor: string
+}>({ judul: '', ringkasan: '', kategori: 'Umum', emoji: '📰', bgColor: '#E8EDE9' })  // Form state pengumuman
+  const [pForm, setPForm] = useState({ judul: '', isi: '', pengirim: '', status: 'aktif' as 'aktif' | 'selesai' })
+
+  // ── Handlers Berita ──
+  const openAddBerita = () => {
+    setEditBerita(null)
+    setBForm({ judul: '', ringkasan: '', kategori: 'Umum', emoji: '📰', bgColor: '#E8EDE9' })
+    setShowBeritaForm(true)
+  }
+  const openEditBerita = (b: Berita) => {
+    setEditBerita(b)
+    setBForm({ judul: b.judul, ringkasan: b.ringkasan, kategori: b.kategori, emoji: b.emoji, bgColor: b.bgColor })
+    setShowBeritaForm(true)
+  }
+  const saveBerita = () => {
+    if (!bForm.judul.trim()) return
+    if (editBerita) {
+      setBeritaList(list => list.map(b => b.id === editBerita.id ? { ...b, ...bForm, isi: b.isi } : b))
+    } else {
+      const newId = Math.max(...beritaList.map(b => b.id)) + 1
+      const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+      setBeritaList(list => [...list, { id: newId, ...bForm, isi: '', tanggal: today, kategori: bForm.kategori as Berita['kategori'] }])
+    }
+    setShowBeritaForm(false)
+  }
+  const deleteBerita = (id: number) => {
+    if (confirm('Hapus berita ini?')) setBeritaList(list => list.filter(b => b.id !== id))
+  }
+
+  // ── Handlers Pengumuman ──
+  const openAddPengumuman = () => {
+    setEditPengumuman(null)
+    setPForm({ judul: '', isi: '', pengirim: '', status: 'aktif' })
+    setShowPengumumanForm(true)
+  }
+  const openEditPengumuman = (p: Pengumuman) => {
+    setEditPengumuman(p)
+    setPForm({ judul: p.judul, isi: p.isi, pengirim: p.pengirim, status: p.status })
+    setShowPengumumanForm(true)
+  }
+  const savePengumuman = () => {
+    if (!pForm.judul.trim()) return
+    if (editPengumuman) {
+      setPengumumanList(list => list.map(p => p.id === editPengumuman.id ? { ...p, ...pForm } : p))
+    } else {
+      const newId = Math.max(...pengumumanList.map(p => p.id)) + 1
+      const today = new Date().toISOString().split('T')[0]
+      setPengumumanList(list => [...list, { id: newId, ...pForm, tanggal: today }])
+    }
+    setShowPengumumanForm(false)
+  }
+  const deletePengumuman = (id: number) => {
+    if (confirm('Hapus pengumuman ini?')) setPengumumanList(list => list.filter(p => p.id !== id))
+  }
+
+  const handleLogout = () => {
+    if (confirm('Yakin ingin keluar?')) router.push('/')
+  }
+
+  // ── Style helpers ──
+  const navItem = (active: boolean) => ({
+    display: 'flex', alignItems: 'center', gap: 10,
+    padding: '10px 16px', borderRadius: 10,
+    fontSize: 14, fontWeight: active ? 600 : 400,
+    color: active ? H : MUTED,
+    background: active ? '#F0FAF4' : 'transparent',
+    cursor: 'pointer', border: 'none', width: '100%',
+    textAlign: 'left' as const, transition: 'all .15s',
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+  })
+
+  const inputStyle = {
+    width: '100%', padding: '10px 13px',
+    border: `1.5px solid ${BORDER}`, borderRadius: 9,
+    fontSize: 14, fontFamily: 'inherit',
+    outline: 'none', color: TEXT, background: '#FAFDF8',
+    boxSizing: 'border-box' as const,
+  }
+
+  const btnPrimary = {
+    padding: '9px 20px', background: H, color: '#fff',
+    border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit',
+  }
+
+  const btnDanger = {
+    padding: '6px 12px', background: '#FEE2E2', color: '#DC2626',
+    border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit',
+  }
+
+  const btnSecondary = {
+    padding: '6px 12px', background: '#F0FAF4', color: H,
+    border: `1px solid ${BORDER}`, borderRadius: 7, fontSize: 12, fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit',
+  }
+
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', background: BG, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+
+      {/* ── Sidebar ── */}
+      <aside style={{
+        width: 240, background: CARD, borderRight: `1px solid ${BORDER}`,
+        display: 'flex', flexDirection: 'column',
+        position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 100,
+        padding: '0 12px',
+      }}>
+        {/* Logo */}
+        <div style={{ padding: '24px 8px 20px', borderBottom: `1px solid ${BORDER}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: 9, background: H,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: '#fff',
+            }}>S</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: TEXT }}>Desa Sukamaju</div>
+              <div style={{ fontSize: 11, color: MUTED }}>Admin Dashboard</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav style={{ flex: 1, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {([
+            { id: 'overview', icon: '📊', label: 'Overview' },
+            { id: 'berita', icon: '📰', label: 'Berita' },
+            { id: 'pengumuman', icon: '📢', label: 'Pengumuman' },
+            { id: 'layanan', icon: '📋', label: 'Layanan Surat' },
+          ] as { id: Tab; icon: string; label: string }[]).map(item => (
+            <button key={item.id} style={navItem(tab === item.id)} onClick={() => setTab(item.id)}>
+              <span style={{ fontSize: 16 }}>{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Logout */}
+        <div style={{ padding: '16px 0', borderTop: `1px solid ${BORDER}` }}>
+          <button style={{ ...navItem(false), color: '#DC2626' }} onClick={handleLogout}>
+            <span>🚪</span> Keluar
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Konten Utama ── */}
+      <main style={{ marginLeft: 240, flex: 1, padding: '32px 36px', minHeight: '100vh' }}>
+
+        {/* Header */}
+        <div style={{ marginBottom: 28 }}>
+          <h1 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 28, fontWeight: 700, color: TEXT, marginBottom: 4,
+          }}>
+            {tab === 'overview' && '📊 Overview'}
+            {tab === 'berita' && '📰 Kelola Berita'}
+            {tab === 'pengumuman' && '📢 Kelola Pengumuman'}
+            {tab === 'layanan' && '📋 Layanan Surat'}
+          </h1>
+          <p style={{ fontSize: 14, color: MUTED }}>
+            Selamat datang, Admin • Desa Sukamaju
+          </p>
+        </div>
+
+        {/* ── TAB: Overview ── */}
+        {tab === 'overview' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
+              <StatCard icon="📰" label="Total Berita" value={beritaList.length} sub="artikel dipublikasi" />
+              <StatCard icon="📢" label="Pengumuman Aktif" value={pengumumanList.filter(p => p.status === 'aktif').length} sub={`dari ${pengumumanList.length} total`} />
+              <StatCard icon="📋" label="Jenis Layanan" value={layananList.length} sub="layanan tersedia" />
+              <StatCard icon="👥" label="Penduduk" value="3.842" sub="jiwa terdaftar" />
+            </div>
+
+            {/* Berita terbaru */}
+            <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
+              <div style={{ padding: '18px 24px', borderBottom: `1px solid ${BORDER}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ fontSize: 16, fontWeight: 600, color: TEXT }}>Berita Terbaru</h2>
+                <button style={btnSecondary} onClick={() => setTab('berita')}>Lihat Semua</button>
+              </div>
+              {beritaList.slice(0, 3).map((b, i) => (
+                <div key={b.id} style={{
+                  padding: '14px 24px', display: 'flex', gap: 14, alignItems: 'center',
+                  borderBottom: i < 2 ? `1px solid ${BORDER}` : 'none',
+                }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: b.bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{b.emoji}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: TEXT, marginBottom: 2 }}>{b.judul}</div>
+                    <div style={{ fontSize: 12, color: MUTED }}>{b.tanggal}</div>
+                  </div>
+                  <span style={{ fontSize: 11, padding: '2px 9px', borderRadius: 100, background: '#F0FAF4', color: H, fontWeight: 600 }}>{b.kategori}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB: Berita ── */}
+        {tab === 'berita' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+              <button style={btnPrimary} onClick={openAddBerita}>+ Tambah Berita</button>
+            </div>
+            <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ background: '#F8FBF9' }}>
+                    {['Berita', 'Kategori', 'Tanggal', 'Aksi'].map(h => (
+                      <th key={h} style={{ padding: '12px 20px', textAlign: 'left', fontWeight: 600, color: MUTED, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {beritaList.map((b, i) => (
+                    <tr key={b.id} style={{ borderTop: `1px solid ${BORDER}` }}>
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                          <div style={{ width: 36, height: 36, borderRadius: 8, background: b.bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{b.emoji}</div>
+                          <div>
+                            <div style={{ fontWeight: 500, color: TEXT, lineHeight: 1.3 }}>{b.judul}</div>
+                            <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{b.ringkasan.slice(0, 50)}…</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '14px 20px' }}>
+                        <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 100, background: '#F0FAF4', color: H, fontWeight: 600 }}>{b.kategori}</span>
+                      </td>
+                      <td style={{ padding: '14px 20px', color: MUTED, fontSize: 13 }}>{b.tanggal}</td>
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button style={btnSecondary} onClick={() => openEditBerita(b)}>✏️ Edit</button>
+                          <button style={btnDanger} onClick={() => deleteBerita(b.id)}>🗑️ Hapus</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB: Pengumuman ── */}
+        {tab === 'pengumuman' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+              <button style={btnPrimary} onClick={openAddPengumuman}>+ Tambah Pengumuman</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {pengumumanList.map((p) => (
+                <div key={p.id} style={{ background: CARD, borderRadius: 14, border: `1px solid ${BORDER}`, padding: '18px 22px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                        <Badge status={p.status} />
+                        <span style={{ fontSize: 12, color: MUTED }}>{p.tanggal}</span>
+                        <span style={{ fontSize: 12, color: MUTED }}>• {p.pengirim}</span>
+                      </div>
+                      <h3 style={{ fontSize: 15, fontWeight: 600, color: TEXT, marginBottom: 6 }}>{p.judul}</h3>
+                      <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>{p.isi}</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button style={btnSecondary} onClick={() => openEditPengumuman(p)}>✏️ Edit</button>
+                      <button style={btnDanger} onClick={() => deletePengumuman(p.id)}>🗑️ Hapus</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB: Layanan ── */}
+        {tab === 'layanan' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              {layananList.map((l) => (
+                <div key={l.id} style={{ background: CARD, borderRadius: 14, border: `1px solid ${BORDER}`, padding: '20px 22px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 11, background: '#F0FAF4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{l.emoji}</div>
+                  <div>
+                    <div style={{ fontWeight: 600, color: TEXT, fontSize: 14, marginBottom: 4 }}>{l.nama}</div>
+                    <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.5 }}>{l.deskripsi}</div>
+                    <span style={{ display: 'inline-block', marginTop: 8, fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 100, background: '#F0FAF4', color: H }}>{l.estimasi}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p style={{ marginTop: 20, fontSize: 13, color: MUTED, textAlign: 'center' }}>
+              Kelola jenis layanan surat melalui <code style={{ background: '#F0FAF4', padding: '2px 6px', borderRadius: 4, color: H }}>src/lib/data.ts</code>
+            </p>
+          </div>
+        )}
+      </main>
+
+      {/* ── Modal Form Berita ── */}
+      {showBeritaForm && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(4px)', zIndex: 999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        }} onClick={e => { if (e.target === e.currentTarget) setShowBeritaForm(false) }}>
+          <div style={{ background: CARD, borderRadius: 18, padding: 32, width: '100%', maxWidth: 500, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, marginBottom: 20, color: TEXT }}>
+              {editBerita ? 'Edit Berita' : 'Tambah Berita Baru'}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Judul Berita</label>
+                <input style={inputStyle} placeholder="Masukkan judul berita" value={bForm.judul} onChange={e => setBForm(f => ({ ...f, judul: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Ringkasan</label>
+                <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical' }} placeholder="Ringkasan singkat berita" value={bForm.ringkasan} onChange={e => setBForm(f => ({ ...f, ringkasan: e.target.value }))} />
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Kategori</label>
+                  <select style={inputStyle} value={bForm.kategori} onChange={e => setBForm(f => ({ ...f, kategori: e.target.value as Berita['kategori'] }))}
+>
+                    {['Pembangunan', 'Budaya', 'Kesehatan', 'Pendidikan', 'Umum'].map(k => <option key={k}>{k}</option>)}
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Emoji</label>
+                  <input style={inputStyle} placeholder="🏗️" value={bForm.emoji} onChange={e => setBForm(f => ({ ...f, emoji: e.target.value }))} />
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
+              <button style={{ ...btnSecondary, padding: '9px 20px' }} onClick={() => setShowBeritaForm(false)}>Batal</button>
+              <button style={btnPrimary} onClick={saveBerita}>{editBerita ? 'Simpan Perubahan' : 'Tambah Berita'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Form Pengumuman ── */}
+      {showPengumumanForm && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(4px)', zIndex: 999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        }} onClick={e => { if (e.target === e.currentTarget) setShowPengumumanForm(false) }}>
+          <div style={{ background: CARD, borderRadius: 18, padding: 32, width: '100%', maxWidth: 500, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, marginBottom: 20, color: TEXT }}>
+              {editPengumuman ? 'Edit Pengumuman' : 'Tambah Pengumuman Baru'}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Judul</label>
+                <input style={inputStyle} placeholder="Judul pengumuman" value={pForm.judul} onChange={e => setPForm(f => ({ ...f, judul: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Isi Pengumuman</label>
+                <textarea style={{ ...inputStyle, minHeight: 100, resize: 'vertical' }} placeholder="Detail isi pengumuman" value={pForm.isi} onChange={e => setPForm(f => ({ ...f, isi: e.target.value }))} />
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Pengirim</label>
+                  <input style={inputStyle} placeholder="cth: Pemerintah Desa" value={pForm.pengirim} onChange={e => setPForm(f => ({ ...f, pengirim: e.target.value }))} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Status</label>
+                  <select style={inputStyle} value={pForm.status} onChange={e => setPForm(f => ({ ...f, status: e.target.value as 'aktif' | 'selesai' }))}>
+                    <option value="aktif">Aktif</option>
+                    <option value="selesai">Selesai</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
+              <button style={{ ...btnSecondary, padding: '9px 20px' }} onClick={() => setShowPengumumanForm(false)}>Batal</button>
+              <button style={btnPrimary} onClick={savePengumuman}>{editPengumuman ? 'Simpan Perubahan' : 'Tambah Pengumuman'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
