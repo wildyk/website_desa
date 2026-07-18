@@ -55,6 +55,7 @@ export interface GaleriItem {
 }
 
 export interface StatDesa {
+  id: number
   label: string
   nilai: string
 }

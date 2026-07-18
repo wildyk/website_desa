@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BERITA, PENGUMUMAN, LAYANAN_SURAT } from '@/lib/data'
-import type { Berita, Pengumuman, LayananSurat } from '@/types'
+import { BERITA, PENGUMUMAN, LAYANAN_SURAT, STAT_DESA } from '@/lib/data'
+import type { Berita, Pengumuman, LayananSurat, StatDesa } from '@/types'
 
 // ── Tipe tab ──────────────────────────────────────────────────
-type Tab = 'overview' | 'berita' | 'pengumuman' | 'layanan'
+type Tab = 'overview' | 'berita' | 'pengumuman' | 'layanan' | 'statistik'
 
 // ── Warna & konstanta ─────────────────────────────────────────
 const H = '#1D6A3A'
@@ -58,22 +58,30 @@ export default function AdminDashboard() {
   const [beritaList, setBeritaList] = useState<Berita[]>(BERITA)
   const [pengumumanList, setPengumumanList] = useState<Pengumuman[]>(PENGUMUMAN)
   const [layananList] = useState<LayananSurat[]>(LAYANAN_SURAT)
+  const [statList, setStatList] = useState<StatDesa[]>(STAT_DESA)
 
   // Modal state
   const [showBeritaForm, setShowBeritaForm] = useState(false)
   const [showPengumumanForm, setShowPengumumanForm] = useState(false)
+  const [showStatForm, setShowStatForm] = useState(false)
   const [editBerita, setEditBerita] = useState<Berita | null>(null)
   const [editPengumuman, setEditPengumuman] = useState<Pengumuman | null>(null)
+  const [editStat, setEditStat] = useState<StatDesa | null>(null)
 
   // Form state berita
-const [bForm, setBForm] = useState<{
-  judul: string
-  ringkasan: string
-  kategori: Berita['kategori']
-  emoji: string
-  bgColor: string
-}>({ judul: '', ringkasan: '', kategori: 'Umum', emoji: '📰', bgColor: '#E8EDE9' })  // Form state pengumuman
+  const [bForm, setBForm] = useState<{
+    judul: string
+    ringkasan: string
+    kategori: Berita['kategori']
+    emoji: string
+    bgColor: string
+  }>({ judul: '', ringkasan: '', kategori: 'Umum', emoji: '📰', bgColor: '#E8EDE9' })
+
+  // Form state pengumuman
   const [pForm, setPForm] = useState({ judul: '', isi: '', pengirim: '', status: 'aktif' as 'aktif' | 'selesai' })
+
+  // Form state statistik
+  const [sForm, setSForm] = useState({ label: '', nilai: '' })
 
   // ── Handlers Berita ──
   const openAddBerita = () => {
@@ -127,6 +135,20 @@ const [bForm, setBForm] = useState<{
     if (confirm('Hapus pengumuman ini?')) setPengumumanList(list => list.filter(p => p.id !== id))
   }
 
+  // ── Handlers Statistik ──
+  const openEditStat = (s: StatDesa) => {
+    setEditStat(s)
+    setSForm({ label: s.label, nilai: s.nilai })
+    setShowStatForm(true)
+  }
+  const saveStat = () => {
+    if (!sForm.label.trim() || !sForm.nilai.trim()) return
+    if (editStat) {
+      setStatList(list => list.map(s => s.id === editStat.id ? { ...s, ...sForm } : s))
+    }
+    setShowStatForm(false)
+  }
+
   const handleLogout = () => {
     if (confirm('Yakin ingin keluar?')) router.push('/')
   }
@@ -169,6 +191,8 @@ const [bForm, setBForm] = useState<{
     cursor: 'pointer', fontFamily: 'inherit',
   }
 
+  const totalPenduduk = statList.find(s => s.label === 'Total Penduduk')?.nilai ?? '-'
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: BG, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
@@ -201,6 +225,7 @@ const [bForm, setBForm] = useState<{
             { id: 'berita', icon: '📰', label: 'Berita' },
             { id: 'pengumuman', icon: '📢', label: 'Pengumuman' },
             { id: 'layanan', icon: '📋', label: 'Layanan Surat' },
+            { id: 'statistik', icon: '📈', label: 'Statistik Desa' },
           ] as { id: Tab; icon: string; label: string }[]).map(item => (
             <button key={item.id} style={navItem(tab === item.id)} onClick={() => setTab(item.id)}>
               <span style={{ fontSize: 16 }}>{item.icon}</span>
@@ -230,6 +255,7 @@ const [bForm, setBForm] = useState<{
             {tab === 'berita' && '📰 Kelola Berita'}
             {tab === 'pengumuman' && '📢 Kelola Pengumuman'}
             {tab === 'layanan' && '📋 Layanan Surat'}
+            {tab === 'statistik' && '📈 Statistik Desa'}
           </h1>
           <p style={{ fontSize: 14, color: MUTED }}>
             Selamat datang, Admin • Desa Sukamaju
@@ -243,7 +269,7 @@ const [bForm, setBForm] = useState<{
               <StatCard icon="📰" label="Total Berita" value={beritaList.length} sub="artikel dipublikasi" />
               <StatCard icon="📢" label="Pengumuman Aktif" value={pengumumanList.filter(p => p.status === 'aktif').length} sub={`dari ${pengumumanList.length} total`} />
               <StatCard icon="📋" label="Jenis Layanan" value={layananList.length} sub="layanan tersedia" />
-              <StatCard icon="👥" label="Penduduk" value="3.842" sub="jiwa terdaftar" />
+              <StatCard icon="👥" label="Penduduk" value={totalPenduduk} sub="jiwa terdaftar" />
             </div>
 
             {/* Berita terbaru */}
@@ -364,6 +390,27 @@ const [bForm, setBForm] = useState<{
             </p>
           </div>
         )}
+
+        {/* ── TAB: Statistik ── */}
+        {tab === 'statistik' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+              {statList.map((s) => (
+                <div key={s.id} style={{
+                  background: CARD, borderRadius: 16, border: `1px solid ${BORDER}`,
+                  padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 10,
+                }}>
+                  <div style={{ fontSize: 13, color: MUTED }}>{s.label}</div>
+                  <div style={{ fontSize: 26, fontWeight: 700, color: TEXT, fontFamily: "'Playfair Display', serif" }}>{s.nilai}</div>
+                  <button style={{ ...btnSecondary, alignSelf: 'flex-start' }} onClick={() => openEditStat(s)}>✏️ Edit</button>
+                </div>
+              ))}
+            </div>
+            <p style={{ marginTop: 20, fontSize: 13, color: MUTED, textAlign: 'center' }}>
+              Angka statistik ini juga tampil di halaman publik desa
+            </p>
+          </div>
+        )}
       </main>
 
       {/* ── Modal Form Berita ── */}
@@ -445,6 +492,35 @@ const [bForm, setBForm] = useState<{
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
               <button style={{ ...btnSecondary, padding: '9px 20px' }} onClick={() => setShowPengumumanForm(false)}>Batal</button>
               <button style={btnPrimary} onClick={savePengumuman}>{editPengumuman ? 'Simpan Perubahan' : 'Tambah Pengumuman'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Form Statistik ── */}
+      {showStatForm && editStat && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(4px)', zIndex: 999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        }} onClick={e => { if (e.target === e.currentTarget) setShowStatForm(false) }}>
+          <div style={{ background: CARD, borderRadius: 18, padding: 32, width: '100%', maxWidth: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, marginBottom: 20, color: TEXT }}>
+              Edit {editStat.label}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Label</label>
+                <input style={inputStyle} value={sForm.label} onChange={e => setSForm(f => ({ ...f, label: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Nilai</label>
+                <input style={inputStyle} value={sForm.nilai} onChange={e => setSForm(f => ({ ...f, nilai: e.target.value }))} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
+              <button style={{ ...btnSecondary, padding: '9px 20px' }} onClick={() => setShowStatForm(false)}>Batal</button>
+              <button style={btnPrimary} onClick={saveStat}>Simpan Perubahan</button>
             </div>
           </div>
         </div>
