@@ -49,8 +49,9 @@ export interface PotensiDesa {
 export interface GaleriItem {
   id: number
   judul: string
-  emoji: string
-  bgColor: string
+  image: string
+  emoji?: string
+  bgColor?: string
   span?: 'normal' | 'wide'
 }
 

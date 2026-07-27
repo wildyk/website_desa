@@ -3,13 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-// Kredensial admin — ganti sesuai kebutuhan
-// Untuk produksi, gunakan autentikasi server-side
-const ADMIN_CREDENTIALS = {
-  username: 'admin',
-  password: 'desa2024',
-}
-
 export default function AdminModal() {
   const router = useRouter()
   const [form, setForm] = useState({ username: '', password: '' })
@@ -22,6 +15,7 @@ export default function AdminModal() {
     document.body.style.overflow = ''
     setError('')
     setForm({ username: '', password: '' })
+    setLoading(false)
   }
 
   const handleLogin = async () => {
@@ -33,19 +27,27 @@ export default function AdminModal() {
     setLoading(true)
     setError('')
 
-    // Simulasi delay network
-    await new Promise(r => setTimeout(r, 800))
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
 
-    if (
-      form.username === ADMIN_CREDENTIALS.username &&
-      form.password === ADMIN_CREDENTIALS.password
-    ) {
-      // Simpan sesi sederhana
-      sessionStorage.setItem('admin_logged_in', 'true')
-      closeModal()
-      router.push('/admin')
-    } else {
-      setError('Username atau password salah.')
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        sessionStorage.setItem('admin_logged_in', 'true')
+        setLoading(false)
+        closeModal()
+        router.push('/admin')
+      } else {
+        setError(data.error || 'Username atau password salah.')
+        setLoading(false)
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('Terjadi kesalahan saat verifikasi login.')
       setLoading(false)
     }
   }
@@ -108,7 +110,7 @@ export default function AdminModal() {
               Login Admin
             </h2>
             <p style={{ fontSize: 14, color: '#6B7A6E' }}>
-              Masuk ke Dashboard Admin Desa Sukamaju
+              Masuk ke Dashboard Admin Desa Rejosari
             </p>
           </div>
 
@@ -198,11 +200,6 @@ export default function AdminModal() {
               </>
             ) : 'Masuk ke Dashboard →'}
           </button>
-
-          {/* Info kredensial default */}
-          <p style={{ fontSize: 11, color: '#6B7A6E', textAlign: 'center', marginTop: 14 }}>
-            Demo: username <code style={{ background: '#F0FAF4', padding: '1px 5px', borderRadius: 4 }}>admin</code> / password <code style={{ background: '#F0FAF4', padding: '1px 5px', borderRadius: 4 }}>desa2024</code>
-          </p>
         </div>
       </div>
 

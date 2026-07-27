@@ -72,8 +72,8 @@ export default function NotFound() {
         {[
           { label: 'Profil', href: '/profil' },
           { label: 'Berita', href: '/berita' },
-          { label: 'Layanan', href: '/layanan' },
           { label: 'Galeri', href: '/galeri' },
+          { label: 'Kontak', href: '/kontak' },
         ].map((l) => (
           <Link key={l.href} href={l.href} style={{
             color: '#4A5E4F', fontSize: 13, fontWeight: 500,

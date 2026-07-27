@@ -1,6 +1,11 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+
 export default function Footer() {
+  const pathname = usePathname() ?? ''
+  const isAdminPage = pathname.startsWith('/admin')
+
   const openModal = () => {
     if (typeof window !== 'undefined') {
       document.getElementById('adminModal')?.classList.add('active')
@@ -9,7 +14,15 @@ export default function Footer() {
   }
 
   return (
-    <footer style={{ background: '#1A2E1F', color: 'rgba(255,255,255,0.65)', padding: '48px 5% 28px' }}>
+    <footer
+      style={{
+        background: '#1A2E1F',
+        color: 'rgba(255,255,255,0.65)',
+        padding: '48px 5% 28px',
+        marginLeft: isAdminPage ? 240 : 0,
+        width: isAdminPage ? 'calc(100% - 240px)' : '100%',
+      }}
+    >
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
@@ -39,31 +52,19 @@ export default function Footer() {
           <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 14 }}>
             Navigasi
           </h4>
-          {['beranda', 'profil', 'berita', 'pengumuman'].map((href) => (
+          {[['/', 'Beranda'], ['/#profil', 'Profil'], ['/#berita', 'Berita'], ['/#pengumuman', 'Pengumuman']].map(([href, label]) => (
             <a key={href} href={href} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', marginBottom: 8 }}>
-              {href.replace('#', '').charAt(0).toUpperCase() + href.replace('#', '').slice(1)}
+              {label}
             </a>
           ))}
         </div>
 
-        {/* Layanan */}
-        <div>
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 14 }}>
-            Layanan
-          </h4>
-          {['Surat Domisili', 'Surat Usaha', 'Pengantar KTP', 'Pengantar KK'].map((l) => (
-            <a key={l} href="layanan" style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', marginBottom: 8 }}>
-              {l}
-            </a>
-          ))}
-        </div>
-
-        {/* Info */}
+        {/* Informasi */}
         <div>
           <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 14 }}>
             Informasi
           </h4>
-          {[['potensi', 'Potensi Desa'], ['galeri', 'Galeri'], ['kontak', 'Kontak']].map(([href, label]) => (
+          {[['/#potensi', 'Potensi Desa'], ['/#galeri', 'Galeri'], ['/#kontak', 'Kontak']].map(([href, label]) => (
             <a key={href} href={href} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', marginBottom: 8 }}>
               {label}
             </a>

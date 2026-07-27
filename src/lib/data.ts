@@ -118,10 +118,10 @@ export const POTENSI: PotensiDesa[] = [
 
 // ── Galeri ───────────────────────────────────────────────────
 export const GALERI: GaleriItem[] = [
-  { id: 1, judul: 'Festival Panen Raya 2024', emoji: '🌾', bgColor: '#E8F5E9', span: 'wide' },
-  { id: 2, judul: 'Gotong Royong',            emoji: '🏗️', bgColor: '#E3F2FD' },
-  { id: 3, judul: 'Kesenian Desa',            emoji: '🎎', bgColor: '#FFF8E1' },
-  { id: 4, judul: 'Posyandu Balita',          emoji: '👶', bgColor: '#F3E5F5' },
-  { id: 5, judul: 'Wisata Alam',              emoji: '🌿', bgColor: '#E8F5E9' },
-  { id: 6, judul: 'UMKM Kerajinan',           emoji: '🏺', bgColor: '#FBE9E7' },
+  { id: 1, judul: 'Festival Panen Raya 2024', image: '/images/galeri-1.jpg' },
+  { id: 2, judul: 'Gotong Royong',            image: '/images/galeri-2.jpg' },
+  { id: 3, judul: 'Kesenian Desa',            image: '/images/galeri-3.jpg' },
+  { id: 4, judul: 'Posyandu Balita',          image: '/images/galeri-4.jpg' },
+  { id: 5, judul: 'Wisata Alam',              image: '/images/galeri-5.jpg' },
+  { id: 6, judul: 'UMKM Kerajinan',           image: '/images/galeri-6.jpg' },
 ]

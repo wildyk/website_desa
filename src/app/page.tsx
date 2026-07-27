@@ -1,27 +1,26 @@
-import Navbar        from '@/components/layout/Navbar'
-import Footer        from '@/components/layout/Footer'
 import Hero          from '@/components/sections/Hero'
 import Berita        from '@/components/sections/Berita'
-import ScrollReveal  from '@/components/ui/ScrollReveal'
+import Galeri        from '@/components/sections/Galeri'
+import Pengumuman    from '@/components/sections/Pengumuman'
+import Potensi       from '@/components/sections/Potensi'
+import Profil        from '@/components/sections/Profil'
+import Kontak        from '@/components/sections/Kontak'
 import Toast         from '@/components/ui/Toast'
-import AdminModal    from '@/components/ui/AdminModal'
 
 export default function Home() {
   return (
     <>
-      {/* Layout */}
-      <Navbar />
-
       <main>
         <Hero />
+        <Profil />
         <Berita />
+        <Pengumuman />
+        <Potensi />
+        <Galeri />
+        <Kontak />
       </main>
 
-
-      {/* Global UI */}
-      <ScrollReveal />
       <Toast />
-      <AdminModal />
     </>
   )
 }

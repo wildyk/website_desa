@@ -1,54 +1,102 @@
-import { GALERI } from '@/lib/data'
+'use client'
+
+import { useEffect, useState } from 'react'
+
+type Item = { id: number; judul: string; image: string }
 
 export default function Galeri() {
+  const [items, setItems] = useState<Item[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/galeri')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        setItems(data)
+        setLoading(false)
+      })
+      .catch(() => {
+        setItems([])
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <section id="galeri" style={{ padding: '88px 5%', background: '#F0FAF4' }}>
       <div style={{ marginBottom: 48 }}>
-        <span style={{display: 'inline-block', background: '#fff', color: '#1D6A3A',
-            fontSize: 12, fontWeight: 600, padding: '5px 14px', borderRadius: 100,
-            textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 20,
-            border: '1px solid rgba(29,106,58,0.15)', }}>
-          Galeri
+        <span style={{ color: '#1D6A3A', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.8px' }}>
+          GALERI
         </span>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.5vw, 42px)', fontWeight: 700, marginBottom: 14 }}>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.5vw, 42px)', marginTop: 14 }}>
           Foto Kegiatan Desa
         </h2>
-        <p style={{ fontSize: 16, color: '#4A5E4F', maxWidth: 520, lineHeight: 1.7 }}>
-          Dokumentasi kegiatan dan keindahan Desa Rejosari.
-        </p>
+        <p style={{ color: '#4A5E4F' }}>Dokumentasi kegiatan dan keindahan desa.</p>
       </div>
 
-      <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
-        {GALERI.map((g) => (
-          <div key={g.id} style={{
-            borderRadius: 14, overflow: 'hidden', position: 'relative',
-            aspectRatio: g.span === 'wide' ? '16/9' : '4/3',
-            gridColumn: g.span === 'wide' ? 'span 2' : undefined,
-            background: g.bgColor, cursor: 'pointer',
+      {!loading && items.length === 0 ? (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '48px 24px',
+            background: '#fff',
+            borderRadius: 22,
+            border: '1px dashed #C2DAC9',
+            maxWidth: 500,
+            margin: '0 auto',
           }}
-            className="galeri-item"
-          >
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, transition: 'transform .3s' }}>
-              {g.emoji}
-            </div>
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(to top, rgba(15,50,25,0.7) 0%, transparent 60%)',
-              display: 'flex', alignItems: 'flex-end', padding: 16,
-              opacity: 0, transition: 'opacity .3s',
-            }}
-              className="galeri-overlay"
+        >
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🖼️</div>
+          <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1A2E1F', marginBottom: 6 }}>
+            Belum ada foto
+          </h3>
+          <p style={{ fontSize: 14, color: '#6B7A6E' }}>
+            Dokumentasi galeri foto kegiatan desa belum tersedia.
+          </p>
+        </div>
+      ) : (
+        <div
+          className="reveal galeri-grid"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}
+        >
+          {items.map((g) => (
+            <figure
+              key={g.id}
+              className="galeri-item"
+              style={{
+                borderRadius: 14,
+                overflow: 'hidden',
+                position: 'relative',
+                aspectRatio: '4 / 3',
+                background: '#F0F4F2',
+                margin: 0,
+              }}
             >
-              <span style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>{g.judul}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <style>{`
-        .galeri-item:hover .galeri-overlay { opacity: 1 !important; }
-        .galeri-item:hover > div:first-child { transform: scale(1.05); }
-      `}</style>
+              <img
+                src={g.image}
+                alt={g.judul}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+              <figcaption
+                className="galeri-overlay"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to top, rgba(15,50,25,0.72), transparent 55%)',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  padding: 16,
+                  opacity: 0,
+                  transition: 'opacity .3s',
+                  color: '#fff',
+                  fontSize: 14,
+                }}
+              >
+                {g.judul}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
     </section>
   )
 }

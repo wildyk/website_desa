@@ -5,13 +5,12 @@ import { usePathname } from 'next/navigation'
 
 const NAV_LINKS = [
   { label: 'Beranda', href: '/' },
-  { label: 'Profil', href: '/profil' },
-  { label: 'Berita', href: '/berita' },
-  { label: 'Pengumuman', href: '/pengumuman' },
-  { label: 'Layanan', href: '/layanan' },
-  { label: 'Potensi', href: '/potensi' },
-  { label: 'Galeri', href: '/galeri' },
-  { label: 'Kontak', href: '/kontak' },
+  { label: 'Profil', href: '/#profil' },
+  { label: 'Berita', href: '/#berita' },
+  { label: 'Pengumuman', href: '/#pengumuman' },
+  { label: 'Potensi', href: '/#potensi' },
+  { label: 'Galeri', href: '/#galeri' },
+  { label: 'Kontak', href: '/#kontak' },
 ]
 
 export default function Navbar() {
@@ -132,7 +131,8 @@ export default function Navbar() {
           }}
         >
           {NAV_LINKS.map((l) => {
-            const isActive = pathname === l.href
+            const targetPath = l.href.split('#')[0]
+            const isActive = pathname === targetPath
 
             return (
               <Link

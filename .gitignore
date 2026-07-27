@@ -29,3 +29,5 @@ yarn-error.log*
 .vscode/
 .idea/
 *.swp
+
+/src/generated/prisma
