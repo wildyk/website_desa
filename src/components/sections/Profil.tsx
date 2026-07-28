@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { PERANGKAT as defaultPerangkat } from '@/lib/data'
 
 interface PerangkatItem {
@@ -23,32 +22,22 @@ function AvatarCard({ p }: { p: PerangkatItem }) {
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       gap: 8, minWidth: 100, maxWidth: 130,
     }}>
-      {/* Avatar */}
+      {/* Avatar — Inisial */}
       <div style={{
         width: 72, height: 72, borderRadius: '50%',
         border: '3px solid #fff',
         boxShadow: '0 4px 16px rgba(29,106,58,0.18)',
-        overflow: 'hidden', flexShrink: 0,
+        flexShrink: 0,
         background: bg,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        position: 'relative',
       }}>
-        {p.foto ? (
-          <Image
-            src={p.foto}
-            alt={p.nama}
-            fill
-            style={{ objectFit: 'cover' }}
-          />
-        ) : (
-          <span style={{
-            fontWeight: 700, fontSize: 20,
-            color: '#fff',
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-          }}>
-            {inisialText}
-          </span>
-        )}
+        <span style={{
+          fontWeight: 700, fontSize: 20,
+          color: '#fff',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+        }}>
+          {inisialText}
+        </span>
       </div>
 
       {/* Info */}

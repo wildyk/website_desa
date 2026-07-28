@@ -1175,7 +1175,7 @@ export default function AdminDashboard() {
         {tab === 'so' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-              <p style={{ color: MUTED, fontSize: 14 }}>Kelola daftar dan foto pengurus perangkat desa yang tampil pada halaman Profil.</p>
+              <p style={{ color: MUTED, fontSize: 14 }}>Kelola daftar pengurus perangkat desa yang tampil pada halaman Profil.</p>
               <button style={btnPrimary as any} onClick={openAddPerangkat}>+ Tambah Perangkat</button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
@@ -1238,11 +1238,7 @@ export default function AdminDashboard() {
                   <input type="color" style={{ ...inputStyle, height: 42, padding: 4, cursor: 'pointer' } as any} value={perangkatForm.warnaBg} onChange={e => setPerangkatForm(f => ({ ...f, warnaBg: e.target.value }))} />
                 </div>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Foto Perangkat (URL atau Unggah File)</label>
-                <input style={{ ...inputStyle, marginBottom: 8 } as any} placeholder="URL Foto (cth: /images/pakdukuh.jpg)" value={perangkatForm.foto} onChange={e => setPerangkatForm(f => ({ ...f, foto: e.target.value }))} />
-                <input type="file" accept="image/*" onChange={e => uploadPerangkatFoto(e.target.files?.[0])} style={{ fontSize: 12 }} />
-              </div>
+
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
               <button style={{ ...btnSecondary, padding: '9px 20px' } as any} onClick={() => setShowPerangkatForm(false)}>Batal</button>
