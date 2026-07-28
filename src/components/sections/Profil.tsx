@@ -1,28 +1,22 @@
-import Image from 'next/image'
-import { PERANGKAT } from '@/lib/data'
+'use client'
 
-// Mapping foto per perangkat — tambahkan path foto sesuai file di /public/images/
-const FOTO_MAP: Record<number, string> = {
-  1: '/images/pakdukuh.jpg',  // Kepala Desa — sudah ada
-  2: '/images/sekdes.jpg',  // Tambahkan kalau sudah punya foto
-  // 3: '/images/kaur-keuangan.jpg',
-  // 4: '/images/kaur-pemerintahan.jpg',
-  // 5: '/images/kasi-pelayanan.jpg',
-  // 6: '/images/staf-admin.jpg',
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { PERANGKAT as defaultPerangkat } from '@/lib/data'
+
+interface PerangkatItem {
+  id: number
+  nama: string
+  jabatan: string
+  foto?: string | null
+  inisial?: string | null
+  warnaBg?: string | null
+  urutan?: number
 }
 
-// Struktur piramida: [[id], [id], [id, id], [id, id]]
-const PIRAMIDA = [
-  [1],        // Kepala Desa
-  [2],        // Sekretaris
-  [3, 4],     // Kaur Keuangan, Kaur Pemerintahan
-  [5, 6],     // Kasi Pelayanan, Staf Administrasi
-]
-
-function AvatarCard({ id }: { id: number }) {
-  const p = PERANGKAT.find(x => x.id === id)
-  if (!p) return null
-  const foto = FOTO_MAP[id]
+function AvatarCard({ p }: { p: PerangkatItem }) {
+  const inisialText = p.inisial || p.nama.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  const bg = p.warnaBg || '#1D6A3A'
 
   return (
     <div style={{
@@ -35,13 +29,13 @@ function AvatarCard({ id }: { id: number }) {
         border: '3px solid #fff',
         boxShadow: '0 4px 16px rgba(29,106,58,0.18)',
         overflow: 'hidden', flexShrink: 0,
-        background: p.warnaBg,
+        background: bg,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative',
       }}>
-        {foto ? (
+        {p.foto ? (
           <Image
-            src={foto}
+            src={p.foto}
             alt={p.nama}
             fill
             style={{ objectFit: 'cover' }}
@@ -49,10 +43,10 @@ function AvatarCard({ id }: { id: number }) {
         ) : (
           <span style={{
             fontWeight: 700, fontSize: 20,
-            color: p.warnaText ?? '#fff',
+            color: '#fff',
             fontFamily: "'Plus Jakarta Sans', sans-serif",
           }}>
-            {p.inisial}
+            {inisialText}
           </span>
         )}
       </div>
@@ -90,6 +84,32 @@ function GarisPenghubung() {
 }
 
 export default function Profil() {
+  const [perangkatList, setPerangkatList] = useState<PerangkatItem[]>(defaultPerangkat)
+
+  useEffect(() => {
+    fetch('/api/perangkat')
+      .then(res => (res.ok ? res.json() : []))
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPerangkatList(data)
+        }
+      })
+      .catch(() => undefined)
+  }, [])
+
+  // Organisasi hierarki otomatis berdasar urutan atau susunan
+  const kepala = perangkatList[0] || null
+  const sekretaris = perangkatList[1] || null
+  const kaurList = perangkatList.slice(2, 4)
+  const kasiStafList = perangkatList.slice(4)
+
+  const piramida = [
+    kepala ? [kepala] : [],
+    sekretaris ? [sekretaris] : [],
+    kaurList,
+    kasiStafList,
+  ].filter(level => level.length > 0)
+
   return (
     <section id="profil" style={{ padding: '88px 5%', background: '#F0FAF4' }}>
       <div style={{
@@ -168,7 +188,7 @@ export default function Profil() {
 
             {/* Piramida */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {PIRAMIDA.map((level, li) => (
+              {piramida.map((level, li) => (
                 <div key={li} style={{ width: '100%' }}>
                   {/* Garis penghubung antar level */}
                   {li > 0 && <GarisPenghubung />}
@@ -193,8 +213,8 @@ export default function Profil() {
                     justifyContent: 'center',
                     gap: level.length === 1 ? 0 : 'clamp(16px, 4vw, 40px)',
                   }}>
-                    {level.map(id => (
-                      <AvatarCard key={id} id={id} />
+                    {level.map(p => (
+                      <AvatarCard key={p.id} p={p} />
                     ))}
                   </div>
                 </div>

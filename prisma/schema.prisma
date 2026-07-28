@@ -83,4 +83,17 @@ model AdminUser {
   updatedAt DateTime @updatedAt
 }
 
+// Perangkat Desa (Struktur Organisasi)
+model PerangkatDesa {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  jabatan   String
+  foto      String?
+  inisial   String?
+  warnaBg   String   @default("#1D6A3A")
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 

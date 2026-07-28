@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-type Tab = 'overview' | 'beranda' | 'potensi' | 'berita' | 'pengumuman' | 'galeri'
+type Tab = 'overview' | 'beranda' | 'so' | 'potensi' | 'berita' | 'pengumuman' | 'galeri'
 
 interface Berita {
   id: number
@@ -34,6 +34,15 @@ interface StatDesa {
 interface Profil { id: number; captionUtama: string; subcaption: string }
 interface GaleriItem { id: number; judul: string; image: string }
 interface PotensiDesa { id: number; judul: string; deskripsi: string; emoji: string }
+interface PerangkatDesa {
+  id: number
+  nama: string
+  jabatan: string
+  foto?: string | null
+  inisial?: string | null
+  warnaBg?: string | null
+  urutan?: number
+}
 
 // ── Warna & konstanta ─────────────────────────────────────────
 const H = '#1D6A3A'
@@ -88,6 +97,7 @@ export default function AdminDashboard() {
   const [profil, setProfil] = useState<Profil | null>(null)
   const [galeriList, setGaleriList] = useState<GaleriItem[]>([])
   const [potensiList, setPotensiList] = useState<PotensiDesa[]>([])
+  const [perangkatList, setPerangkatList] = useState<PerangkatDesa[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
@@ -174,13 +184,14 @@ export default function AdminDashboard() {
   const fetchAllData = async () => {
     try {
       setLoading(true)
-      const [beritaRes, pengumumanRes, statistikRes, profilRes, galeriRes, potensiRes] = await Promise.all([
+      const [beritaRes, pengumumanRes, statistikRes, profilRes, galeriRes, potensiRes, perangkatRes] = await Promise.all([
         fetch('/api/berita'),
         fetch('/api/pengumuman'),
         fetch('/api/statistik'),
         fetch('/api/profil'),
         fetch('/api/galeri'),
         fetch('/api/potensi'),
+        fetch('/api/perangkat'),
       ])
       
       if (beritaRes.ok) setBeritaList(await beritaRes.json())
@@ -193,6 +204,7 @@ export default function AdminDashboard() {
       }
       if (galeriRes.ok) setGaleriList(await galeriRes.json())
       if (potensiRes.ok) setPotensiList(await potensiRes.json())
+      if (perangkatRes.ok) setPerangkatList(await perangkatRes.json())
     } catch (error) {
       console.error('Error fetching data:', error)
       showToast('Gagal memuat data dari server.', 'error')
@@ -207,12 +219,14 @@ export default function AdminDashboard() {
   const [showStatForm, setShowStatForm] = useState(false)
   const [showGaleriForm, setShowGaleriForm] = useState(false)
   const [showPotensiForm, setShowPotensiForm] = useState(false)
+  const [showPerangkatForm, setShowPerangkatForm] = useState(false)
 
   const [editBerita, setEditBerita] = useState<Berita | null>(null)
   const [editPengumuman, setEditPengumuman] = useState<Pengumuman | null>(null)
   const [editStat, setEditStat] = useState<StatDesa | null>(null)
   const [editGaleri, setEditGaleri] = useState<GaleriItem | null>(null)
   const [editPotensi, setEditPotensi] = useState<PotensiDesa | null>(null)
+  const [editPerangkat, setEditPerangkat] = useState<PerangkatDesa | null>(null)
 
   // Form state
   const [bForm, setBForm] = useState({ judul: '', ringkasan: '', kategori: 'Umum' })
@@ -221,6 +235,7 @@ export default function AdminDashboard() {
   const [profilForm, setProfilForm] = useState({ captionUtama: '', subcaption: '' })
   const [gForm, setGForm] = useState({ judul: '', image: '' })
   const [potensiForm, setPotensiForm] = useState({ judul: '', deskripsi: '', emoji: '🌱' })
+  const [perangkatForm, setPerangkatForm] = useState({ nama: '', jabatan: '', foto: '', inisial: '', warnaBg: '#1D6A3A', urutan: 0 })
 
   // ── Handler Ganti Password / Account ──
   const handleUpdateAccount = async () => {
@@ -350,6 +365,100 @@ export default function AdminDashboard() {
         }
       },
     })
+  }
+
+  // ── Handlers Perangkat Desa (SO) ──
+  const openAddPerangkat = () => {
+    setEditPerangkat(null)
+    setPerangkatForm({ nama: '', jabatan: '', foto: '', inisial: '', warnaBg: '#1D6A3A', urutan: perangkatList.length + 1 })
+    setShowPerangkatForm(true)
+  }
+
+  const openEditPerangkat = (p: PerangkatDesa) => {
+    setEditPerangkat(p)
+    setPerangkatForm({
+      nama: p.nama,
+      jabatan: p.jabatan,
+      foto: p.foto || '',
+      inisial: p.inisial || '',
+      warnaBg: p.warnaBg || '#1D6A3A',
+      urutan: p.urutan || 0,
+    })
+    setShowPerangkatForm(true)
+  }
+
+  const savePerangkat = async () => {
+    if (!perangkatForm.nama.trim() || !perangkatForm.jabatan.trim()) {
+      showToast('Nama dan Jabatan wajib diisi.', 'error')
+      return
+    }
+    setSaving(true)
+    try {
+      const url = editPerangkat ? `/api/perangkat/${editPerangkat.id}` : '/api/perangkat'
+      const method = editPerangkat ? 'PUT' : 'POST'
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(perangkatForm),
+      })
+
+      if (res.ok) {
+        const item = await res.json()
+        setPerangkatList(list =>
+          editPerangkat ? list.map(p => (p.id === item.id ? item : p)) : [...list, item]
+        )
+        setShowPerangkatForm(false)
+        showToast(editPerangkat ? 'Perangkat desa berhasil diperbarui!' : 'Perangkat desa berhasil ditambahkan!', 'success')
+      } else {
+        showToast('Gagal menyimpan perangkat desa.', 'error')
+      }
+    } catch (error) {
+      console.error('Error saving perangkat:', error)
+      showToast('Terjadi kesalahan pada server.', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const deletePerangkat = (id: number) => {
+    askConfirm({
+      title: 'Hapus Perangkat Desa',
+      message: 'Apakah Anda yakin ingin menghapus pengurus perangkat desa ini?',
+      confirmText: 'Ya, Hapus',
+      danger: true,
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/perangkat/${id}`, { method: 'DELETE' })
+          if (res.ok) {
+            setPerangkatList(list => list.filter(p => p.id !== id))
+            showToast('Perangkat desa berhasil dihapus.', 'success')
+          } else {
+            showToast('Gagal menghapus perangkat desa.', 'error')
+          }
+        } catch (error) {
+          console.error('Error deleting perangkat:', error)
+          showToast('Terjadi kesalahan saat menghapus.', 'error')
+        }
+      },
+    })
+  }
+
+  const uploadPerangkatFoto = async (file?: File) => {
+    if (!file) return
+    if (file.size > 500 * 1024) {
+      showToast('Ukuran berkas gambar melebihi batas maksimal 500 KB.', 'error')
+      return
+    }
+    const data = new FormData()
+    data.append('file', file)
+    const response = await fetch('/api/upload', { method: 'POST', body: data })
+    if (response.ok) {
+      const { url } = await response.json()
+      setPerangkatForm(form => ({ ...form, foto: url }))
+      showToast('Foto perangkat berhasil diunggah!', 'success')
+    } else {
+      showToast('Gagal mengunggah foto. Maksimal 500 KB.', 'error')
+    }
   }
 
   // ── Handlers Berita ──
@@ -770,6 +879,7 @@ export default function AdminDashboard() {
           {([
             { id: 'overview', icon: '📊', label: 'Overview' },
             { id: 'beranda', icon: '🏠', label: 'Beranda' },
+            { id: 'so', icon: '👔', label: 'Struktur Organisasi' },
             { id: 'potensi', icon: '🌱', label: 'Potensi Desa' },
             { id: 'berita', icon: '📰', label: 'Berita' },
             { id: 'pengumuman', icon: '📢', label: 'Pengumuman' },
@@ -801,6 +911,7 @@ export default function AdminDashboard() {
           }}>
             {tab === 'overview' && '📊 Overview'}
             {tab === 'beranda' && '🏠 Kelola Beranda'}
+            {tab === 'so' && '👔 Kelola Struktur Organisasi'}
             {tab === 'potensi' && '🌱 Kelola Potensi Desa'}
             {tab === 'berita' && '📰 Kelola Berita'}
             {tab === 'pengumuman' && '📢 Kelola Pengumuman'}
@@ -815,6 +926,7 @@ export default function AdminDashboard() {
         {tab === 'overview' && (
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
+              <StatCard icon="👔" label="Perangkat Desa" value={perangkatList.length} sub="pengurus desa" />
               <StatCard icon="📰" label="Total Berita" value={beritaList.length} sub="artikel dipublikasi" />
               <StatCard icon="📢" label="Pengumuman Aktif" value={pengumumanList.filter(p => p.status === 'aktif').length} sub={`dari ${pengumumanList.length} total`} />
               <StatCard icon="🌱" label="Potensi Desa" value={potensiList.length} sub="sektor potensi" />
@@ -1052,7 +1164,86 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* ── TAB: Struktur Organisasi (SO) ── */}
+        {tab === 'so' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+              <p style={{ color: MUTED, fontSize: 14 }}>Kelola daftar dan foto pengurus perangkat desa yang tampil pada halaman Profil.</p>
+              <button style={btnPrimary as any} onClick={openAddPerangkat}>+ Tambah Perangkat</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              {perangkatList.map((p) => (
+                <div key={p.id} style={{ background: CARD, borderRadius: 16, border: `1px solid ${BORDER}`, padding: 20, display: 'flex', gap: 16, alignItems: 'center' }}>
+                  <div style={{
+                    width: 60, height: 60, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+                    background: p.warnaBg || H, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 18,
+                    position: 'relative', border: `2px solid ${BORDER}`,
+                  }}>
+                    {p.foto ? (
+                      <img src={p.foto} alt={p.nama} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      p.inisial || p.nama[0]
+                    )}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 700, color: TEXT, marginBottom: 3 }}>{p.nama}</h3>
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 100, background: '#F0FAF4', color: H, fontWeight: 600 }}>{p.jabatan}</span>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                      <button style={btnSecondary as any} onClick={() => openEditPerangkat(p)}>✏️ Edit</button>
+                      <button style={btnDanger as any} onClick={() => deletePerangkat(p.id)}>🗑️ Hapus</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </main>
+
+      {/* ── Modal Form Perangkat Desa ── */}
+      {showPerangkatForm && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(4px)', zIndex: 999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        }} onClick={e => { if (e.target === e.currentTarget) setShowPerangkatForm(false) }}>
+          <div style={{ background: CARD, borderRadius: 18, padding: 32, width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, marginBottom: 20, color: TEXT }}>
+              {editPerangkat ? 'Edit Perangkat Desa' : 'Tambah Perangkat Desa Baru'}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Nama Lengkap & Gelar</label>
+                <input style={inputStyle as any} placeholder="cth: Budi Hartono, S.Sos" value={perangkatForm.nama} onChange={e => setPerangkatForm(f => ({ ...f, nama: e.target.value }))} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Jabatan</label>
+                <input style={inputStyle as any} placeholder="cth: Kepala Desa / Sekretaris Desa" value={perangkatForm.jabatan} onChange={e => setPerangkatForm(f => ({ ...f, jabatan: e.target.value }))} />
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Inisial Avatar</label>
+                  <input style={inputStyle as any} placeholder="cth: BH" value={perangkatForm.inisial} onChange={e => setPerangkatForm(f => ({ ...f, inisial: e.target.value }))} />
+                </div>
+                <div style={{ width: 120 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Warna Avatar</label>
+                  <input type="color" style={{ ...inputStyle, height: 42, padding: 4, cursor: 'pointer' } as any} value={perangkatForm.warnaBg} onChange={e => setPerangkatForm(f => ({ ...f, warnaBg: e.target.value }))} />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Foto Perangkat (URL atau Unggah File)</label>
+                <input style={{ ...inputStyle, marginBottom: 8 } as any} placeholder="URL Foto (cth: /images/pakdukuh.jpg)" value={perangkatForm.foto} onChange={e => setPerangkatForm(f => ({ ...f, foto: e.target.value }))} />
+                <input type="file" accept="image/*" onChange={e => uploadPerangkatFoto(e.target.files?.[0])} style={{ fontSize: 12 }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
+              <button style={{ ...btnSecondary, padding: '9px 20px' } as any} onClick={() => setShowPerangkatForm(false)}>Batal</button>
+              <button style={btnPrimary as any} onClick={savePerangkat}>{editPerangkat ? 'Simpan Perubahan' : 'Tambah Perangkat'}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Modal Form Potensi ── */}
       {showPotensiForm && (
