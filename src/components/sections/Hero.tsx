@@ -10,15 +10,26 @@ const defaultProfil = {
   subcaption: 'Portal digital resmi desa untuk informasi publik dan kegiatan masyarakat.',
 }
 
+const defaultStats: Stat[] = [
+  { id: 1, label: 'Jumlah KK', nilai: '1.024' },
+  { id: 2, label: 'Jumlah RT', nilai: '8' },
+  { id: 3, label: 'RW', nilai: '2' },
+]
+
 export default function Hero() {
   const [profil, setProfil] = useState<Profil>(defaultProfil)
-  const [stats, setStats] = useState<Stat[]>([])
+  const [stats, setStats] = useState<Stat[]>(defaultStats)
 
   useEffect(() => {
     Promise.all([fetch('/api/profil'), fetch('/api/statistik')])
       .then(async ([profilRes, statsRes]) => {
         if (profilRes.ok) setProfil(await profilRes.json())
-        if (statsRes.ok) setStats(await statsRes.json())
+        if (statsRes.ok) {
+          const resStats = await statsRes.json()
+          if (Array.isArray(resStats) && resStats.length > 0) {
+            setStats(resStats)
+          }
+        }
       })
       .catch(() => undefined)
   }, [])

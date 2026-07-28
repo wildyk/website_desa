@@ -862,7 +862,7 @@ export default function AdminDashboard() {
             <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BORDER}`, padding: 24 }}>
               <h2 style={{ fontSize: 17, marginBottom: 18 }}>Statistik Beranda</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14 }}>
-                {statList.filter(s => ['Total Penduduk', 'Kepala Keluarga', 'RT / RW', 'Dusun'].includes(s.label)).map(s => (
+                {statList.map(s => (
                   <div key={s.id} style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
                     <div style={{ color: MUTED, fontSize: 13 }}>{s.label}</div>
                     <div style={{ fontSize: 24, fontWeight: 700, margin: '4px 0 12px' }}>{s.nilai}</div>

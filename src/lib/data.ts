@@ -10,10 +10,9 @@ import type {
 
 // ── Statistik Desa ──────────────────────────────────────────
 export const STAT_DESA: StatDesa[] = [
-  { id: 1, label: 'Total Penduduk', nilai: '3.842' },
-  { id: 2, label: 'Kepala Keluarga', nilai: '1.024' },
-  { id: 3, label: 'RT / RW', nilai: '8' },
-  { id: 4, label: 'Dusun', nilai: '2' },
+  { id: 1, label: 'Jumlah KK', nilai: '1.024' },
+  { id: 2, label: 'Jumlah RT', nilai: '8' },
+  { id: 3, label: 'RW', nilai: '2' },
 ]
 // ── Berita ───────────────────────────────────────────────────
 export const BERITA: Berita[] = [
