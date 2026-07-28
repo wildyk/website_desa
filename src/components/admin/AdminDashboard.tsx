@@ -618,6 +618,12 @@ export default function AdminDashboard() {
   }
 
   // ── Handlers Statistik ──
+  const openAddStat = () => {
+    setEditStat(null)
+    setSForm({ label: '', nilai: '' })
+    setShowStatForm(true)
+  }
+
   const openEditStat = (s: StatDesa) => {
     setEditStat(s)
     setSForm({ label: s.label, nilai: s.nilai })
@@ -638,17 +644,59 @@ export default function AdminDashboard() {
           body: JSON.stringify(sForm),
         })
         if (res.ok) {
-          setStatList(list => list.map(s => s.id === editStat.id ? { ...s, ...sForm } : s))
+          const updated = await res.json()
+          setStatList(list => list.map(s => s.id === editStat.id ? updated : s))
           setShowStatForm(false)
           showToast('Statistik berhasil diperbarui!', 'success')
+        } else {
+          const err = await res.json()
+          showToast(err.error || 'Gagal menyimpan statistik.', 'error')
+        }
+      } else {
+        const res = await fetch('/api/statistik', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sForm),
+        })
+        if (res.ok) {
+          const newStat = await res.json()
+          setStatList(list => [...list, newStat])
+          setShowStatForm(false)
+          showToast('Statistik baru berhasil ditambahkan!', 'success')
+        } else {
+          const err = await res.json()
+          showToast(err.error || 'Gagal menambahkan statistik.', 'error')
         }
       }
     } catch (error) {
       console.error('Error saving statistik:', error)
-      showToast('Gagal menyimpan statistik.', 'error')
+      showToast('Terjadi kesalahan pada server.', 'error')
     } finally {
       setSaving(false)
     }
+  }
+
+  const deleteStat = (id: number) => {
+    askConfirm({
+      title: 'Hapus Statistik',
+      message: 'Apakah Anda yakin ingin menghapus data statistik ini?',
+      confirmText: 'Ya, Hapus',
+      danger: true,
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/statistik/${id}`, { method: 'DELETE' })
+          if (res.ok) {
+            setStatList(list => list.filter(s => s.id !== id))
+            showToast('Statistik berhasil dihapus.', 'success')
+          } else {
+            showToast('Gagal menghapus statistik.', 'error')
+          }
+        } catch (error) {
+          console.error('Error deleting stat:', error)
+          showToast('Terjadi kesalahan saat menghapus.', 'error')
+        }
+      },
+    })
   }
 
   const saveProfil = async () => {
@@ -771,7 +819,21 @@ export default function AdminDashboard() {
     cursor: 'pointer', fontFamily: 'inherit',
   }
 
-  const totalPenduduk = statList.find(s => s.label === 'Total Penduduk')?.nilai ?? '-'
+  const totalPendudukItem = statList.find(s => {
+    const l = s.label.toLowerCase().trim()
+    return l.includes('warga') || l.includes('penduduk') || l.includes('jiwa')
+  })
+  const totalPenduduk = totalPendudukItem?.nilai || '3.450'
+
+  const handleEditPenduduk = () => {
+    if (totalPendudukItem) {
+      openEditStat(totalPendudukItem)
+    } else {
+      setEditStat(null)
+      setSForm({ label: 'Jumlah Warga', nilai: '3.450' })
+      setShowStatForm(true)
+    }
+  }
 
   if (loading) {
     return (
@@ -937,7 +999,9 @@ export default function AdminDashboard() {
               <StatCard icon="📰" label="Total Berita" value={beritaList.length} sub="artikel dipublikasi" />
               <StatCard icon="📢" label="Pengumuman Aktif" value={pengumumanList.filter(p => p.status === 'aktif').length} sub={`dari ${pengumumanList.length} total`} />
               <StatCard icon="🌱" label="Potensi Desa" value={potensiList.length} sub="sektor potensi" />
-              <StatCard icon="👥" label="Penduduk" value={totalPenduduk} sub="jiwa terdaftar" />
+              <div style={{ cursor: 'pointer' }} onClick={handleEditPenduduk} title="Klik untuk mengedit jumlah penduduk (jiwa terdaftar)">
+                <StatCard icon="👥" label="Penduduk" value={totalPenduduk} sub="jiwa terdaftar ✏️ (klik edit)" />
+              </div>
             </div>
 
             {/* Berita terbaru */}
@@ -979,15 +1043,34 @@ export default function AdminDashboard() {
 
             {/* Section 2: Statistik Beranda */}
             <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BORDER}`, padding: 24 }}>
-              <h2 style={{ fontSize: 17, marginBottom: 18 }}>Statistik Beranda</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14 }}>
-                {statList.map(s => (
-                  <div key={s.id} style={{ border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
-                    <div style={{ color: MUTED, fontSize: 13 }}>{s.label}</div>
-                    <div style={{ fontSize: 24, fontWeight: 700, margin: '4px 0 12px' }}>{s.nilai}</div>
-                    <button style={btnSecondary as any} onClick={() => openEditStat(s)}>Edit</button>
-                  </div>
-                ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                <h2 style={{ fontSize: 17, color: TEXT }}>Statistik Beranda & Warga</h2>
+                <button style={btnPrimary as any} onClick={openAddStat}>+ Tambah Statistik</button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+                {statList.map(s => {
+                  const l = s.label.toLowerCase().trim()
+                  const isWarga = l.includes('warga') || l.includes('penduduk') || l.includes('jiwa')
+                  return (
+                    <div key={s.id} style={{
+                      border: `1px solid ${isWarga ? '#C8E6D4' : BORDER}`,
+                      borderRadius: 12, padding: 16,
+                      background: isWarga ? '#F0FAF4' : CARD,
+                    }}>
+                      <div style={{ color: MUTED, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span>{s.label}</span>
+                        {isWarga && (
+                          <span style={{ fontSize: 10, background: H, color: '#fff', padding: '2px 8px', borderRadius: 100, fontWeight: 600 }}>Overview Warga</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 24, fontWeight: 700, margin: '4px 0 12px', color: TEXT }}>{s.nilai}</div>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button style={btnSecondary as any} onClick={() => openEditStat(s)}>✏️ Edit</button>
+                        <button style={btnDanger as any} onClick={() => deleteStat(s.id)}>🗑️ Hapus</button>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
 
@@ -1391,7 +1474,7 @@ export default function AdminDashboard() {
       )}
 
       {/* ── Modal Form Statistik ── */}
-      {showStatForm && editStat && (
+      {showStatForm && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
           backdropFilter: 'blur(4px)', zIndex: 999,
@@ -1399,21 +1482,21 @@ export default function AdminDashboard() {
         }} onClick={e => { if (e.target === e.currentTarget) setShowStatForm(false) }}>
           <div style={{ background: CARD, borderRadius: 18, padding: 32, width: '100%', maxWidth: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, marginBottom: 20, color: TEXT }}>
-              Edit {editStat.label}
+              {editStat ? `Edit ${editStat.label}` : 'Tambah Statistik Baru'}
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Label</label>
-                <input style={inputStyle as any} value={sForm.label} onChange={e => setSForm(f => ({ ...f, label: e.target.value }))} />
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Label (contoh: Jumlah Warga, Jumlah KK)</label>
+                <input style={inputStyle as any} placeholder="cth: Jumlah Warga" value={sForm.label} onChange={e => setSForm(f => ({ ...f, label: e.target.value }))} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Nilai</label>
-                <input style={inputStyle as any} value={sForm.nilai} onChange={e => setSForm(f => ({ ...f, nilai: e.target.value }))} />
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: TEXT }}>Nilai (contoh: 3.450)</label>
+                <input style={inputStyle as any} placeholder="cth: 3.450" value={sForm.nilai} onChange={e => setSForm(f => ({ ...f, nilai: e.target.value }))} />
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
               <button style={{ ...btnSecondary, padding: '9px 20px' } as any} onClick={() => setShowStatForm(false)}>Batal</button>
-              <button style={btnPrimary as any} onClick={saveStat}>Simpan Perubahan</button>
+              <button style={btnPrimary as any} onClick={saveStat}>{editStat ? 'Simpan Perubahan' : 'Tambah Statistik'}</button>
             </div>
           </div>
         </div>
