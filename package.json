@@ -7,11 +7,13 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "next": "^14.2.5",
+    "next-sitemap": "^4.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
