@@ -443,22 +443,26 @@ export default function AdminDashboard() {
     })
   }
 
-  const uploadPerangkatFoto = async (file?: File) => {
+  const uploadPerangkatFoto = (file?: File) => {
     if (!file) return
     if (file.size > 500 * 1024) {
       showToast('Ukuran berkas gambar melebihi batas maksimal 500 KB.', 'error')
       return
     }
-    const data = new FormData()
-    data.append('file', file)
-    const response = await fetch('/api/upload', { method: 'POST', body: data })
-    if (response.ok) {
-      const { url } = await response.json()
-      setPerangkatForm(form => ({ ...form, foto: url }))
-      showToast('Foto perangkat berhasil diunggah!', 'success')
-    } else {
-      showToast('Gagal mengunggah foto. Maksimal 500 KB.', 'error')
+    if (!file.type.startsWith('image/')) {
+      showToast('Pilih file gambar yang valid.', 'error')
+      return
     }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string
+      setPerangkatForm(form => ({ ...form, foto: base64 }))
+      showToast('Foto siap disimpan!', 'success')
+    }
+    reader.onerror = () => {
+      showToast('Gagal membaca file gambar.', 'error')
+    }
+    reader.readAsDataURL(file)
   }
 
   // ── Handlers Berita ──
@@ -675,23 +679,26 @@ export default function AdminDashboard() {
     }
   }
 
-  const uploadGaleriImage = async (file?: File) => {
+  const uploadGaleriImage = (file?: File) => {
     if (!file) return
     if (file.size > 500 * 1024) {
       showToast('Ukuran berkas gambar melebihi batas maksimal 500 KB.', 'error')
       return
     }
-    const data = new FormData()
-    data.append('file', file)
-    const response = await fetch('/api/upload', { method: 'POST', body: data })
-    if (response.ok) {
-      const { url } = await response.json()
-      setGForm(form => ({ ...form, image: url }))
-      showToast('Gambar berhasil diunggah!', 'success')
-    } else {
-      const res = await response.json()
-      showToast(res.error || 'Gagal mengunggah gambar. Ukuran maksimal 500 KB.', 'error')
+    if (!file.type.startsWith('image/')) {
+      showToast('Pilih file gambar yang valid.', 'error')
+      return
     }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string
+      setGForm(form => ({ ...form, image: base64 }))
+      showToast('Gambar siap disimpan!', 'success')
+    }
+    reader.onerror = () => {
+      showToast('Gagal membaca file gambar.', 'error')
+    }
+    reader.readAsDataURL(file)
   }
 
   const deleteGaleri = (id: number) => {
