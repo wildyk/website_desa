@@ -201,13 +201,6 @@ export default function Profil() {
               ))}
             </div>
 
-            {/* Catatan foto */}
-            <p style={{
-              fontSize: 11, color: '#6B7A6E', textAlign: 'center',
-              marginTop: 24, fontStyle: 'italic',
-            }}>
-              Tambahkan foto di <code style={{ background: '#F0FAF4', padding: '1px 5px', borderRadius: 4, color: '#1D6A3A' }}>public/images/</code> dan update <code style={{ background: '#F0FAF4', padding: '1px 5px', borderRadius: 4, color: '#1D6A3A' }}>FOTO_MAP</code>
-            </p>
           </div>
         </div>
 
