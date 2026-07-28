@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 const DEFAULT_USERNAME = 'edirejosari'
-const DEFAULT_PASSWORD = 'desa2024'
+const DEFAULT_PASSWORD = 'desa2026'
 
 async function ensureDefaultAdmin() {
   try {
