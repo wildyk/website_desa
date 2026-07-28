@@ -1,12 +1,13 @@
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 const categoryAppearance: Record<string, { emoji: string; bgColor: string }> = {
   Pembangunan: { emoji: '🏗️', bgColor: '#E8F5E9' }, Budaya: { emoji: '🎭', bgColor: '#FFF8E1' },
   Kesehatan: { emoji: '💊', bgColor: '#E3F2FD' }, Pendidikan: { emoji: '📚', bgColor: '#F3E8FF' },
   Umum: { emoji: '📰', bgColor: '#E8EDE9' },
 }
-
 // PUT edit berita
 export async function PUT(
   req: NextRequest,
