@@ -86,17 +86,13 @@ export default function Profil() {
       .catch(() => undefined)
   }, [])
 
-  // Organisasi hierarki otomatis berdasar urutan atau susunan
+  // Organisasi hierarki: Kepala/Dukuh di atas, seluruh perangkat/RT di bawahnya sejajar
   const kepala = perangkatList[0] || null
-  const sekretaris = perangkatList[1] || null
-  const kaurList = perangkatList.slice(2, 4)
-  const kasiStafList = perangkatList.slice(4)
+  const anggota = perangkatList.slice(1)
 
   const piramida = [
     kepala ? [kepala] : [],
-    sekretaris ? [sekretaris] : [],
-    kaurList,
-    kasiStafList,
+    anggota,
   ].filter(level => level.length > 0)
 
   return (
@@ -199,8 +195,10 @@ export default function Profil() {
                   {/* Node di level ini */}
                   <div style={{
                     display: 'flex',
+                    flexWrap: 'wrap',
                     justifyContent: 'center',
-                    gap: level.length === 1 ? 0 : 'clamp(16px, 4vw, 40px)',
+                    alignItems: 'flex-start',
+                    gap: level.length === 1 ? 0 : 'clamp(12px, 3vw, 24px)',
                   }}>
                     {level.map(p => (
                       <AvatarCard key={p.id} p={p} />
