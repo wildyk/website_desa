@@ -2,11 +2,11 @@ import Profil from '@/components/sections/Profil'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Profil Desa — Desa Rejosari',
-  description: 'Mengenal Desa Rejosari: sejarah, visi misi, struktur organisasi, dan perangkat desa.',
+  title: 'Profil Dusun — Dusun Rejosari',
+  description: 'Mengenal Dusun Rejosari: sejarah, visi misi, struktur organisasi, dan perangkat dusun.',
   openGraph: {
-    title: 'Profil Desa Rejosari',
-    description: 'Sejarah, visi misi, dan perangkat Desa Rejosari.',
+    title: 'Profil Dusun Rejosari',
+    description: 'Sejarah, visi misi, dan perangkat Dusun Rejosari.',
     type: 'website',
   },
 }

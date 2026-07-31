@@ -8,14 +8,24 @@ import AdminModal from '@/components/ui/AdminModal'
 
 export const metadata: Metadata = {
   title: 'Desa Rejosari — Website Resmi Desa',
-  description: 'Portal digital resmi Desa Rejosari untuk layanan administrasi, informasi, dan potensi desa.',
-  keywords: 'desa Rejosari, layanan desa, administrasi desa, website desa',
+  description:
+    'Portal digital resmi Desa Rejosari untuk layanan administrasi, informasi, dan potensi desa.',
+  keywords: [
+    'desa Rejosari',
+    'website desa',
+    'administrasi desa',
+    'layanan desa',
+    'potensi desa'
+  ],
+
   verification: {
     google: '43OcDx5nKidiEumN5oHxg-OxB74pAflE6VQV8JGRHbA',
   },
+
   openGraph: {
     title: 'Desa Rejosari',
-    description: 'Portal resmi Desa Rejosari — Maju, Sejahtera & Bermartabat',
+    description:
+      'Portal resmi Desa Rejosari — Maju, Sejahtera & Bermartabat',
     type: 'website',
     url: 'https://desarejosari.vercel.app',
     siteName: 'Website Desa Rejosari',
