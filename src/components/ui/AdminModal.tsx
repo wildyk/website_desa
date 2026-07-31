@@ -110,7 +110,7 @@ export default function AdminModal() {
               Login Admin
             </h2>
             <p style={{ fontSize: 14, color: '#6B7A6E' }}>
-              Masuk ke Dashboard Admin Desa Rejosari
+              Masuk ke Dashboard Admin Dusun Rejosari
             </p>
           </div>
 

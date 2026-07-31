@@ -2,7 +2,7 @@ export default function Kontak() {
   const kontakList = [
     { icon: '📍', label: 'Alamat Kantor', value: 'Jl. Raya Rejosari No. 01, Kec. Indah\nKab. Sejahtera, Jawa Tengah 12345' },
     { icon: '📞', label: 'Telepon',       value: '(0294) 123-4567' },
-    { icon: '✉️', label: 'Email',          value: 'desa.rejosari@jateng.go.id' },
+    { icon: '✉️', label: 'Email',          value: 'dusun.rejosari@jateng.go.id' },
     { icon: '🕐', label: 'Jam Pelayanan', value: 'Senin – Jumat: 08.00 – 15.00 WIB' },
   ]
 
@@ -24,10 +24,10 @@ export default function Kontak() {
           fontSize: 'clamp(26px, 3vw, 38px)', fontWeight: 700,
           color: '#1A2E1F', marginBottom: 12,
         }}>
-          Hubungi Desa Rejosari
+          Hubungi Dusun Rejosari
         </h2>
         <p style={{ fontSize: 15, color: '#4A5E4F', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
-          Kami siap membantu Anda. Kunjungi kantor desa atau hubungi kami melalui kontak di bawah ini.
+          Kami siap membantu Anda. Kunjungi kantor dusun atau hubungi kami melalui kontak di bawah ini.
         </p>
       </div>
 
@@ -168,7 +168,7 @@ export default function Kontak() {
                 📍
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A2E1F' }}>Kantor Desa Rejosari</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A2E1F' }}>Kantor Dusun Rejosari</div>
                 <div style={{ fontSize: 11, color: '#6B7A6E' }}>Kecamatan Indah, Jawa Tengah</div>
               </div>
               <a

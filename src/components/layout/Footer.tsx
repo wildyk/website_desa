@@ -40,10 +40,10 @@ export default function Footer() {
             fontSize: 20, fontWeight: 700, color: '#fff', marginBottom: 12,
           }}>S</div>
           <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#fff', marginBottom: 8 }}>
-            Desa Rejosari
+            Dusun Rejosari
           </h3>
           <p style={{ fontSize: 13, lineHeight: 1.65 }}>
-            Website resmi Pemerintah Desa Rejosari. Melayani dengan hati, membangun dengan karya.
+            Website resmi Pemerintah Dusun Rejosari. Melayani dengan hati, membangun dengan karya.
           </p>
         </div>
 
@@ -64,7 +64,7 @@ export default function Footer() {
           <h4 style={{ fontSize: 13, fontWeight: 600, color: '#fff', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 14 }}>
             Informasi
           </h4>
-          {[['/#potensi', 'Potensi Desa'], ['/#galeri', 'Galeri'], ['/#kontak', 'Kontak']].map(([href, label]) => (
+          {[['/#potensi', 'Potensi Dusun'], ['/#galeri', 'Galeri'], ['/#kontak', 'Kontak']].map(([href, label]) => (
             <a key={href} href={href} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', marginBottom: 8 }}>
               {label}
             </a>
@@ -76,8 +76,8 @@ export default function Footer() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, flexWrap: 'wrap', gap: 8 }}>
-        <span>© 2024 Desa Rejosari — Semua hak dilindungi.</span>
-        <span>Dibangun dengan ❤️ untuk kemajuan desa</span>
+        <span>© 2024 Dusun Rejosari — Semua hak dilindungi.</span>
+        <span>Dibangun dengan ❤️ untuk kemajuan dusun</span>
       </div>
     </footer>
   )

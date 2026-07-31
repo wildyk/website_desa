@@ -103,7 +103,7 @@ export default function Navbar() {
                 letterSpacing: '.3px',
               }}
             >
-              Desa Rejosari
+              Dusun Rejosari
             </span>
 
             <small

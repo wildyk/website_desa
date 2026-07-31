@@ -34,7 +34,7 @@ export default function Layanan() {
           Layanan Administrasi Digital
         </h2>
         <p style={{ fontSize: 16, color: '#4A5E4F', maxWidth: 520, lineHeight: 1.7 }}>
-          Urus surat keterangan dari mana saja, tanpa perlu antri di kantor desa.
+          Urus surat keterangan dari mana saja, tanpa perlu antri di kantor dusun.
         </p>
       </div>
 

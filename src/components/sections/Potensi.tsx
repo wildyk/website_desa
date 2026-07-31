@@ -44,7 +44,7 @@ export default function Potensi() {
             border: '1px solid rgba(29,106,58,0.15)',
           }}
         >
-          Potensi Desa
+          Potensi Dusun
         </span>
         <h2
           style={{
@@ -54,7 +54,7 @@ export default function Potensi() {
             marginBottom: 14,
           }}
         >
-          Kekayaan Desa Rejosari
+          Kekayaan Dusun Rejosari
         </h2>
         <p
           style={{
@@ -65,7 +65,7 @@ export default function Potensi() {
             lineHeight: 1.7,
           }}
         >
-          Dari alam hingga budaya, desa kami menyimpan potensi yang terus berkembang.
+          Dari alam hingga budaya, dusun kami menyimpan potensi yang terus berkembang.
         </p>
       </div>
 
@@ -83,10 +83,10 @@ export default function Potensi() {
         >
           <div style={{ fontSize: 40, marginBottom: 12 }}>🌱</div>
           <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1A2E1F', marginBottom: 6 }}>
-            Belum ada potensi desa
+            Belum ada potensi dusun
           </h3>
           <p style={{ fontSize: 14, color: '#6B7A6E' }}>
-            Data potensi desa belum ditambahkan oleh pengelola desa.
+            Data potensi dusun belum ditambahkan oleh pengelola dusun.
           </p>
         </div>
       ) : (

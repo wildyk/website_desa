@@ -111,20 +111,20 @@ export default function Profil() {
             textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 20,
             border: '1px solid rgba(29,106,58,0.15)',
           }}>
-            Profil Desa
+            Profil Dusun
           </span>
           <h2 style={{
             fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.5vw, 42px)', fontWeight: 700, marginBottom: 14,
           }}>
-            Mengenal Lebih Dekat Desa Rejosari
+            Mengenal Lebih Dekat Dusun Rejosari
           </h2>
           <p style={{ color: '#4A5E4F', fontSize: 15, lineHeight: 1.75, marginBottom: 16 }}>
-            Desa Rejosari berdiri sejak tahun 1920 dan merupakan salah satu desa tua di Kecamatan Indah.
-            Dengan luas wilayah 247 hektare, desa ini terdiri dari dua dusun dan delapan RT/RW.
+            Dusun Rejosari berdiri sejak tahun 1920 dan merupakan salah satu dusun tua di Kecamatan Indah.
+            Dengan luas wilayah 247 hektare, dusun ini terdiri dari delapan RT/RW.
           </p>
           <p style={{ color: '#4A5E4F', fontSize: 15, lineHeight: 1.75, marginBottom: 24 }}>
             Sebagian besar penduduk bermata pencaharian sebagai petani, pengrajin, dan pelaku UMKM.
-            Desa ini terus berkembang seiring dengan program pembangunan desa yang berkelanjutan.
+            Dusun ini terus berkembang seiring dengan program pembangunan dusun yang berkelanjutan.
           </p>
 
           {/* Visi */}
@@ -137,7 +137,7 @@ export default function Profil() {
               Visi
             </h4>
             <p style={{ color: '#4A5E4F', fontSize: 14, lineHeight: 1.6 }}>
-              "Terwujudnya Desa Rejosari yang Maju, Mandiri, dan Sejahtera berlandaskan nilai-nilai Gotong Royong."
+              "Terwujudnya Dusun Rejosari yang Maju, Mandiri, dan Sejahtera berlandaskan nilai-nilai Gotong Royong."
             </p>
           </div>
 
@@ -151,7 +151,7 @@ export default function Profil() {
               Misi
             </h4>
             <p style={{ color: '#4A5E4F', fontSize: 14, lineHeight: 1.6 }}>
-              Meningkatkan kualitas SDM, pembangunan infrastruktur merata, dan pengembangan ekonomi berbasis potensi lokal desa.
+              Meningkatkan kualitas SDM, pembangunan infrastruktur merata, dan pengembangan ekonomi berbasis potensi lokal dusun.
             </p>
           </div>
         </div>

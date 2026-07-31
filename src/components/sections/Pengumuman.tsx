@@ -36,7 +36,7 @@ export default function Pengumuman() {
           PENGUMUMAN
         </span>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.5vw, 42px)', marginTop: 14 }}>
-          Pengumuman Resmi Desa
+          Pengumuman Resmi Dusun
         </h2>
       </div>
 
@@ -57,7 +57,7 @@ export default function Pengumuman() {
             Belum ada pengumuman
           </h3>
           <p style={{ fontSize: 14, color: '#6B7A6E' }}>
-            Saat ini belum ada pengumuman resmi dari pemerintah desa.
+            Saat ini belum ada pengumuman resmi dari pemerintah dusun.
           </p>
         </div>
       ) : (

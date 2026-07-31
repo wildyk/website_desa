@@ -28,9 +28,9 @@ export default function Galeri() {
           GALERI
         </span>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.5vw, 42px)', marginTop: 14 }}>
-          Foto Kegiatan Desa
+          Foto Kegiatan Dusun
         </h2>
-        <p style={{ color: '#4A5E4F' }}>Dokumentasi kegiatan dan keindahan desa.</p>
+        <p style={{ color: '#4A5E4F' }}>Dokumentasi kegiatan dan keindahan dusun.</p>
       </div>
 
       {!loading && items.length === 0 ? (
@@ -50,7 +50,7 @@ export default function Galeri() {
             Belum ada foto
           </h3>
           <p style={{ fontSize: 14, color: '#6B7A6E' }}>
-            Dokumentasi galeri foto kegiatan desa belum tersedia.
+            Dokumentasi galeri foto kegiatan dusun belum tersedia.
           </p>
         </div>
       ) : (

@@ -35,7 +35,7 @@ export default function Berita() {
     <section id="berita" style={{ padding: '88px 5%', background: '#F0FAF4' }}>
       <div style={{ marginBottom: 48 }}>
         <span style={{ color: '#1D6A3A', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.8px' }}>
-          BERITA DESA
+          BERITA DUSUN
         </span>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.5vw, 42px)', marginTop: 14 }}>
           Berita &amp; Kabar Terbaru
